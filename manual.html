@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ledger — Broker Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAF9;
+    --surface: #FFFFFF;
+    --surface-2: #F3F2EF;
+    --border: #E8E6E1;
+    --border-strong: #D8D5CE;
+    --ink: #1C1B1A;
+    --ink-dim: #6F6D68;
+    --ink-faint: #A19E97;
+    --brand: #3730E0;
+    --brand-soft: #EEEDFC;
+    --brand-soft-border: #D6D3F7;
+    --amber: #B5560E;
+    --amber-soft: #FBF0E6;
+    --amber-soft-border: #F0D9BE;
+    --green: #1C7A4D;
+    --green-soft: #E8F5EE;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { overflow-x: hidden; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  .eyebrow {
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- MOBILE TOP BAR ---------- */
+  .mobile-bar {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 30;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+
+  .mobile-bar .mb-title {
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mb-mark {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: var(--brand);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+  }
+
+  .mobile-bar button {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar {
+    width: 252px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .brand {
+    padding: 0 20px 20px;
+    margin-bottom: 16px;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .brand-mark {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: var(--brand);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .brand h1 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .brand .sub {
+    color: var(--ink-dim);
+    font-size: 12.5px;
+  }
+
+  nav { padding: 0 12px; }
+
+  nav .nav-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 6px 10px 8px;
+  }
+
+  nav button.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--ink-dim);
+    background: none;
+    border: none;
+    border-radius: 7px;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    margin-bottom: 1px;
+  }
+
+  nav button.nav-link:hover { background: var(--surface-2); color: var(--ink); }
+  nav button.nav-link.active { color: var(--brand); background: var(--brand-soft); font-weight: 600; }
+
+  .nav-icon { width: 16px; height: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .nav-link .count {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+  .nav-link.active .count { color: var(--brand); opacity: 0.7; }
+
+  /* ---------- MAIN ---------- */
+  main { flex: 1; max-width: 760px; padding: 40px 48px 48px; width: 100%; }
+
+  header.page-head { margin-bottom: 28px; }
+
+  header.page-head .eyebrow { margin-bottom: 8px; display: block; }
+
+  header.page-head h2 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin-bottom: 10px;
+  }
+
+  header.page-head .desc {
+    color: var(--ink-dim);
+    font-size: 14px;
+    max-width: 540px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 7px;
+  }
+
+  .card-title { font-weight: 600; font-size: 14.5px; line-height: 1.35; }
+
+  .tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 3px 9px;
+    border-radius: 100px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .tag.rule { background: var(--brand-soft); color: var(--brand); }
+  .tag.warning { background: var(--amber-soft); color: var(--amber); }
+  .tag.strategy { background: var(--green-soft); color: var(--green); }
+  .tag.watch { background: var(--surface-2); color: var(--ink-dim); border: 1px solid var(--border); }
+  .tag.term { background: var(--surface-2); color: var(--ink-dim); border: 1px solid var(--border); }
+
+  .card p { color: var(--ink-dim); font-size: 13.5px; margin: 0; }
+  .card p.note {
+    color: var(--ink);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .card p.note .note-label {
+    font-weight: 600;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    margin-right: 6px;
+  }
+
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 10px;
+  }
+
+  .platform-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+
+  .platform-card .pname-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+
+  .platform-mark {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+
+  .platform-card .pname { font-weight: 700; font-size: 14.5px; }
+
+  .platform-card .prole {
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+    padding-left: 30px;
+  }
+
+  .platform-card ul { padding-left: 30px; }
+  .platform-card li { font-size: 12.5px; color: var(--ink-dim); margin-bottom: 5px; list-style: none; position: relative; }
+  .platform-card li::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: 7px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--border-strong);
+  }
+
+  .more-info { margin-top: 10px; }
+
+  .more-info summary {
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--brand);
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+  }
+
+  .more-info summary::-webkit-details-marker { display: none; }
+
+  .more-info summary::before {
+    content: "+";
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .more-info[open] summary::before { content: "–"; }
+
+  .more-info[open] summary { margin-bottom: 8px; }
+
+  .more-info ul {
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 2px;
+  }
+
+  .glossary-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2px 20px;
+  }
+
+  .glossary-item {
+    border-bottom: 1px solid var(--border);
+    padding: 14px 0;
+  }
+  .glossary-item:last-child { border-bottom: none; }
+
+  .glossary-item-head {
+    display: flex;
+    gap: 18px;
+  }
+
+  .glossary-item .term {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    color: var(--brand);
+    font-size: 12.5px;
+    flex: 0 0 170px;
+    padding-top: 1px;
+  }
+
+  .glossary-item .def { color: var(--ink-dim); font-size: 13.5px; flex: 1; }
+
+  .glossary-item .more-info {
+    margin-top: 8px;
+    margin-left: 188px;
+  }
+
+  .glossary-item .more-info summary {
+    font-size: 11.5px;
+  }
+
+  .glossary-item .more-info p {
+    color: var(--ink-dim);
+    font-size: 13px;
+    line-height: 1.55;
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 2px;
+  }
+
+  @media (max-width: 600px) {
+    .glossary-item-head { flex-direction: column; gap: 4px; }
+    .glossary-item .term { flex: none; }
+    .glossary-item .more-info { margin-left: 0; }
+  }
+
+  .add-note {
+    border: 1px dashed var(--border-strong);
+    border-radius: 10px;
+    padding: 16px 18px;
+    color: var(--ink-faint);
+    font-size: 13px;
+    text-align: center;
+  }
+
+  /* ---------- MOBILE BOTTOM TABS ---------- */
+  .bottom-tabs {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 30;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .bottom-tabs button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+    padding: 9px 2px 8px;
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    cursor: pointer;
+    font-size: 9.5px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .bottom-tabs button.active { color: var(--brand); }
+  .bottom-tabs .tab-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+  .bottom-tabs .tab-icon svg { width: 16px; height: 16px; }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 860px) {
+    .sidebar.desktop-sidebar { display: none; }
+    .mobile-bar { display: flex; }
+    .bottom-tabs { display: flex; }
+
+    main { padding: 76px 16px 92px; }
+
+    .platform-grid { grid-template-columns: 1fr; }
+    header.page-head h2 { font-size: 22px; }
+    .card, .platform-card { padding: 15px 16px; }
+    .card-head { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mobile-bar">
+  <div class="mb-title"><span class="mb-mark">L</span>The Ledger</div>
+</div>
+
+<div class="sidebar desktop-sidebar">
+  <div class="brand">
+    <div class="brand-row">
+      <div class="brand-mark">L</div>
+      <div>
+        <h1>The Ledger</h1>
+      </div>
+    </div>
+    <div class="sub">Ticket broker training &amp; reference</div>
+  </div>
+  <nav class="desktop-nav">
+    <div class="nav-section-label">Sections</div>
+  </nav>
+</div>
+
+<main>
+  <!-- SOFTWARE -->
+  <div class="panel active" data-panel="software">
+    <header class="page-head">
+      <span class="eyebrow">01 · Tools of the Trade</span>
+      <h2>Software &amp; Platforms</h2>
+      <p class="desc">Where tickets get bought (primary), where they get sold (secondary), and the tools that watch the primary sites for you. We buy manually — no bots — so speed and the right tooling are what let us compete.</p>
+    </header>
+
+    <div class="platform-grid">
+      <div class="platform-card">
+        <div class="pname-row"><div class="platform-mark" style="background:#026CDF;">TM</div><div class="pname">Ticketmaster</div></div>
+        <div class="prole">Primary marketplace</div>
+        <ul>
+          <li>Main primary seller for most major tours and arenas</li>
+          <li>Also runs "Verified Resale" — the <b>Standard Reseller</b> program for listing tickets back on TM itself</li>
+        </ul>
+        <details class="more-info">
+          <summary>More info</summary>
+          <ul>
+            <li><b>Face Value Exchange</b> is a listing type where resale is capped at the exact price you paid — no markup allowed, so there's no profit margin on a Face Value Exchange listing.</li>
+            <li>Delivery type must be set to <b>Mobile</b>, never Will Call. Will Call requires the buyer to physically pick up/check in, so there's no transferable code and the ticket can't be resold.</li>
+            <li>Most checkouts give a 7–8 minute timer, but some shows have <b>no timer</b> at all — be ready to decide immediately on those.</li>
+            <li>Doesn't always flag <b>limited view</b> seats (obstructions like beams or speakers). If a seat is limited view, disclose it on the listing — an undisclosed one risks a chargeback where the buyer keeps the seat <b>and</b> gets refunded.</li>
+          </ul>
+        </details>
+      </div>
+      <div class="platform-card">
+        <div class="pname-row"><div class="platform-mark" style="background:#FF5B49;">SG</div><div class="pname">SeatGeek</div></div>
+        <div class="prole">Primary + secondary</div>
+        <ul><li>Used as a primary ticket source for some venues/events</li></ul>
+      </div>
+      <div class="platform-card">
+        <div class="pname-row"><div class="platform-mark" style="background:#E1261C;">AX</div><div class="pname">AXS</div></div>
+        <div class="prole">Primary marketplace</div>
+        <ul><li>Primary ticketing platform, alternative to Ticketmaster for certain venues</li></ul>
+      </div>
+      <div class="platform-card">
+        <div class="pname-row"><div class="platform-mark" style="background:#3C1053;">SH</div><div class="pname">StubHub</div></div>
+        <div class="prole">Secondary marketplace</div>
+        <ul>
+          <li>Use for Canadian shows and Broadway shows specifically</li>
+          <li><b>Not</b> VividSeats for these — StubHub is the preferred secondary</li>
+        </ul>
+      </div>
+      <div class="platform-card">
+        <div class="pname-row"><div class="platform-mark" style="background:#1E96FC;">VS</div><div class="pname">VividSeats</div></div>
+        <div class="prole">Secondary marketplace</div>
+        <ul>
+          <li>The secondary market we check to compare pricing and get a sense of where a ticket will land</li>
+          <li>For Canadian/Broadway shows, use StubHub instead</li>
+        </ul>
+        <details class="more-info">
+          <summary>More info</summary>
+          <ul>
+            <li>Prices show with fees baked in by default — always toggle fees <b>off</b> before comparing, or the number you see will be inflated.</li>
+            <li>Example: Ticketmaster shows $100, VividSeats shows $170 with fees on — but with fees off it's actually $140. You'll end up selling around $140, not $170, so pricing off the fee-inclusive number is a common, costly mistake.</li>
+          </ul>
+        </details>
+      </div>
+      <div class="platform-card">
+        <div class="pname-row"><div class="platform-mark" style="background:#1C1B1A;">PH</div><div class="pname">Phantom</div></div>
+        <div class="prole">Drop checker / monitor tool</div>
+        <ul>
+          <li>Tells you the moment tickets drop or the price drops on Ticketmaster or other sites</li>
+          <li>Gives you direct links straight to the listing — e.g. the Ticketmaster link and the VividSeats link — so you can jump straight in instead of searching</li>
+          <li>We buy manually, not with bots, so this is what lets us move fast enough to compete</li>
+        </ul>
+      </div>
+      <div class="platform-card">
+        <div class="pname-row"><div class="platform-mark" style="background:#0E7C61;">DQ</div><div class="pname">DataIQ</div></div>
+        <div class="prole">Pricing / comp tool</div>
+        <ul>
+          <li>Pricing data sourced from other brokers' actual sales, via a site called Automatic</li>
+          <li>Use to sanity-check what a ticket should sell for before you buy or list</li>
+        </ul>
+      </div>
+      <div class="platform-card">
+        <div class="pname-row"><div class="platform-mark" style="background:#6B4FD8;">TM</div><div class="pname">TicketMetric</div></div>
+        <div class="prole">Pricing / comp tool</div>
+        <ul>
+          <li>A second pricing/comp data source, separate from DataIQ — cross-check both when pricing matters</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRESALES -->
+  <div class="panel" data-panel="presales">
+    <header class="page-head">
+      <span class="eyebrow">02 · Getting In Early</span>
+      <h2>Presales &amp; Drops</h2>
+      <p class="desc">Most good inventory never reaches general public sale. It moves through presale codes first — knowing which kind of code you're holding determines whether it's worth pursuing.</p>
+    </header>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">Account-specific or code-specific presales</div><span class="tag rule">Rule</span></div>
+      <p>Some presales require you to buy using the specific account that signed up (account-specific), or require a specific code tied to that signup even if the account itself doesn't matter (code-specific). Either way, keep track of exactly which account or code was used to sign up so you buy with the right one later.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Generic codes</div><span class="tag watch">Watch</span></div>
+      <p>Same code works for everyone — not tied to a specific account or signup. Because it's shared, you don't need to have signed up yourself; you can get the code from someone else. Usually not the move to rely on for hard-to-get inventory, since competition on the same code is high.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Used account</div><span class="tag strategy">Strategy</span></div>
+      <p>A "used account" is one that's already at the top of the waiting list/queue for a specific show — i.e. it has standing for that event. Worth tracking which of your accounts are "used" for which shows.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Artist presale</div><span class="tag term">Type</span></div>
+      <p>The presale you actually sign up for directly. Typically runs through Live Nation, the company that owns Ticketmaster.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Venue presale</div><span class="tag watch">Watch</span></div>
+      <p>Has its own unique code. Harder to find than other codes, but the upside is these codes tend to be generic once you do find them — so the bottleneck is sourcing the code, not competing for inventory. Runs through Ticketmaster.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Citi Card member presale</div><span class="tag warning">Watch out</span></div>
+      <p>Requires a Citi card to access. The boss's card sometimes doesn't have enough available funds when the window opens, so we're encouraged to maintain our own Citi card for this rather than relying on someone else's.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">ShowsOnSale.com</div><span class="tag term">Resource</span></div>
+      <p>Website used to find generic presale codes.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Weekly presale calendar</div><span class="tag rule">Rule</span></div>
+      <p style="margin-bottom:10px;">Standard weekly pattern across most shows, building from most restricted access to fully open:</p>
+      <p style="margin-bottom:4px;"><b>Tuesday</b> — Citi Card member presale</p>
+      <p style="margin-bottom:4px;"><b>Wednesday</b> — Artist presale (via Live Nation)</p>
+      <p style="margin-bottom:4px;"><b>Thursday</b> — Venue presale (via Ticketmaster)</p>
+      <p><b>Friday</b> — Public on-sale, no code needed, anyone can buy</p>
+      <p class="note"><span class="note-label">Timing</span>Presales nominally start at 10 AM in the artist/venue's own local time zone — not 10 AM Eastern. So for someone on the East Coast, the actual window could open anywhere from 10 AM to 1 PM Eastern depending on which time zone the show is in.</p>
+    </div>
+  </div>
+
+  <!-- STRATEGY -->
+  <div class="panel" data-panel="strategy">
+    <header class="page-head">
+      <span class="eyebrow">03 · Evaluating a Buy</span>
+      <h2>Buying Strategy</h2>
+      <p class="desc">This is the part that's still being figured out as we go — how to tell if a ticket is actually worth buying. These are working notes, not fixed rules.</p>
+    </header>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">Core method: compare the spread</div><span class="tag strategy">Strategy</span></div>
+      <p>Find the same row/section on Ticketmaster (primary) and compare it to what that same seat is going for on VividSeats (secondary), fees turned off. If the prices are close, it's probably not worth buying — there's no room for profit. If VividSeats is running meaningfully higher, roughly 40% or more above the Ticketmaster price, that gap may represent real margin and is worth a closer look.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Is it actually selling?</div><span class="tag strategy">Strategy</span></div>
+      <p>A price spread alone isn't enough — check whether that section is actually moving. How long have tickets in that section been listed? When was the last actual sale in that section? If a section has been sitting for months with no sales despite presale tickets being out for a long time, that's a sign demand may not be there even if the listed price looks attractive.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Venue fit vs. artist popularity</div><span class="tag strategy">Strategy</span></div>
+      <p>One input among several: check the artist's popularity (e.g. Spotify monthly listeners) against the size of the venue. An artist with a large following playing a comparatively small venue suggests low supply/high demand. An artist who may struggle to fill a much larger venue (stadium vs. their actual draw) is a sign the show might not sell out, which adds risk. Venue types worth knowing: stadiums, arenas, outdoor amphitheaters (e.g. the venue by Jones Beach), and general admission. This is one factor among others, not a standalone answer.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Demand can shift — example, not a standing rule</div><span class="tag term">Example</span></div>
+      <p>Sometimes a specific artist is the one everyone in the industry is watching and buying right now — but that's a moving target, not a fixed list. Noah Kahan was given as a current example of that kind of artist; the underlying point is recognizing when an artist is in that position, not treating any one name as permanently a buy.</p>
+    </div>
+  </div>
+
+  <!-- GLOSSARY -->
+  <div class="panel" data-panel="glossary">
+    <header class="page-head">
+      <span class="eyebrow">04 · Reference</span>
+      <h2>Glossary</h2>
+      <p class="desc">Quick lookup, A–Z. Each term has a short definition — expand for more detail on what it's used for and things to watch.</p>
+    </header>
+
+    <div class="glossary-wrap">
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Account-specific / code-specific</div>
+        <div class="def">A presale requiring either the exact account that signed up, or a specific code tied to that signup.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Track which account or code was used to sign up so you buy with the right credentials later — using the wrong one can mean the presale access doesn't work at all.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Artist presale</div>
+        <div class="def">A presale you sign up for directly through the artist.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Typically run through Live Nation, the company that owns Ticketmaster. In the weekly presale pattern, this is usually the Wednesday window.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">AXS</div>
+        <div class="def">Primary ticketing platform, an alternative to Ticketmaster for certain venues.</div>
+        </div>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Bots</div>
+        <div class="def">Automated buying tools some competitors use to purchase tickets instantly the moment they're available.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>We buy manually, not with bots, so there's often no time to deliberate once something drops — speed and tooling like Phantom are what let us compete without them.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Chargeback (limited view)</div>
+        <div class="def">What happens if an undisclosed limited-view seat gets sold and the buyer disputes it.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>The buyer can get a refund and still attend the show — a double loss on that ticket. This is why limited view always needs to be disclosed on the listing.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Citi Card member presale</div>
+        <div class="def">A presale window that requires a Citi card to access.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>The card on hand sometimes doesn't have enough available funds when the window opens, so it's worth maintaining your own Citi card for this rather than relying on someone else's. In the weekly pattern, this is usually the Tuesday window.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">DataIQ</div>
+        <div class="def">A pricing/comp tool sourced from other brokers' actual sales data.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Pulls data via a site called Automatic. Use it to sanity-check what a ticket should actually sell for before you buy or list — good to cross-check against TicketMetric.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Drop checker</div>
+        <div class="def">A tool that monitors sale pages and alerts you the instant tickets drop or a price changes.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Phantom is the one we use — it often hands you direct links straight to the listing (Ticketmaster, VividSeats, etc.) so you can act immediately instead of searching.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Face Value Exchange</div>
+        <div class="def">A listing type where resale is capped at the exact price you paid.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>No markup allowed — effectively no profit margin on a Face Value Exchange listing. Worth knowing so you can recognize it and avoid ending up with this listing type unintentionally.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Generic code</div>
+        <div class="def">A presale code that works for anyone, not tied to a specific signup.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>You don't need to have registered yourself — the code can be shared or sourced from someone else (e.g. via ShowsOnSale.com).</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Limited view</div>
+        <div class="def">A seat with an obstructed sightline — a beam, speaker stack, staging, etc.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Ticketmaster may not flag this on its own. If a seat is limited view, disclose it on the listing — see Chargeback (limited view) for what happens if you don't.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">No timer</div>
+        <div class="def">A checkout that skips the usual countdown clock.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Most Ticketmaster checkouts give you 7–8 minutes to complete a purchase. Some shows have no timer at all, forcing an immediate buy decision with no buffer to think it over.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Phantom</div>
+        <div class="def">The drop checker / monitoring tool we use.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Tells you the moment tickets drop or the price drops on Ticketmaster or other sites, and gives direct links straight to the listing so you can jump in instead of searching.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">SeatGeek</div>
+        <div class="def">Used as a primary ticket source for some venues and events.</div>
+        </div>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">ShowsOnSale.com</div>
+        <div class="def">A website used to find generic presale codes.</div>
+        </div>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Standard Reseller</div>
+        <div class="def">Ticketmaster's official resale program.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>For listing tickets back on the TM platform itself, rather than a separate secondary marketplace.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">StubHub</div>
+        <div class="def">Secondary marketplace.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Use specifically for Canadian shows and Broadway shows — not VividSeats for these.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Ticketmaster</div>
+        <div class="def">The main primary marketplace for most major tours and arenas.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Also runs Standard Reseller. See the Face Value Exchange, Will Call, No timer, and Limited view entries for things to watch on TM specifically.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">TicketMetric</div>
+        <div class="def">A second pricing/comp tool, separate data source from DataIQ.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Worth cross-checking both DataIQ and TicketMetric when pricing matters, since they pull from different sources.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Used account</div>
+        <div class="def">An account that's already at the top of the waiting list/queue for a specific show.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Worth tracking which of your accounts are "used" for which shows, since that standing carries weight for that specific event's queue.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Venue presale</div>
+        <div class="def">A presale code tied to the venue itself.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Run through Ticketmaster. Harder to source than other codes, but tends to be generic once found — the bottleneck is finding the code, not competing for inventory. In the weekly pattern, this is usually the Thursday window.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">VividSeats</div>
+        <div class="def">Secondary marketplace used to compare pricing.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Prices show with fees baked in by default — always toggle fees off before comparing, or the number will be inflated (e.g. $170 with fees on might actually be $140 with them off). Not used for Canadian/Broadway shows — use StubHub instead.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Weekly presale calendar</div>
+        <div class="def">The standard pattern most presales follow across the week.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Tuesday — Citi Card member presale. Wednesday — Artist presale (Live Nation). Thursday — Venue presale (Ticketmaster). Friday — Public on-sale, no code needed. Presales nominally start at 10 AM in the show's own local time zone, so the actual window for someone on the East Coast could open anywhere from 10 AM to 1 PM Eastern depending on where the show is.</p>
+        </details>
+      </div>
+
+      <div class="glossary-item">
+        <div class="glossary-item-head">
+          <div class="term">Will Call</div>
+        <div class="def">A delivery method requiring physical pickup/check-in by the buyer.</div>
+        </div>
+        <details class="more-info"><summary>More info</summary>
+          <p>Never select this on Ticketmaster — it makes the ticket unsellable since there's no transferable mobile code. Delivery type should always be Mobile.</p>
+        </details>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<div class="bottom-tabs" id="bottomTabs"></div>
+
+<script>
+  const ICONS = {
+    software: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="8" cy="12" r="2"/><line x1="14" y1="10" x2="18" y2="10"/><line x1="14" y1="14" x2="18" y2="14"/></svg>',
+    presales: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    strategy: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+    glossary: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>',
+  };
+
+  const SECTIONS = [
+    { id: "software", label: "Software & Platforms", short: "Platforms", count: 8 },
+    { id: "presales", label: "Presales & Drops", short: "Presales", count: 8 },
+    { id: "strategy", label: "Buying Strategy", short: "Strategy", count: 4 },
+    { id: "glossary", label: "Glossary", short: "Glossary", count: 24 },
+  ];
+
+  const desktopNav = document.querySelector('.desktop-nav');
+  const bottomTabsWrap = document.getElementById('bottomTabs');
+
+  SECTIONS.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-link';
+    btn.dataset.target = s.id;
+    btn.innerHTML = `<span class="nav-icon">${ICONS[s.id]}</span>${s.label}<span class="count">${s.count}</span>`;
+    desktopNav.appendChild(btn);
+  });
+
+  // Bottom tabs: all sections, always visible
+  SECTIONS.forEach(s => {
+    const btn = document.createElement('button');
+    btn.dataset.target = s.id;
+    btn.innerHTML = `<span class="tab-icon">${ICONS[s.id]}</span><span>${s.short}</span>`;
+    bottomTabsWrap.appendChild(btn);
+  });
+
+  const allNavLinks = document.querySelectorAll('.nav-link');
+  const allTabButtons = document.querySelectorAll('.bottom-tabs button[data-target]');
+  const panels = document.querySelectorAll('.panel');
+
+  function setActive(id) {
+    panels.forEach(p => p.classList.toggle('active', p.dataset.panel === id));
+    allNavLinks.forEach(l => l.classList.toggle('active', l.dataset.target === id));
+    allTabButtons.forEach(b => b.classList.toggle('active', b.dataset.target === id));
+    window.scrollTo({ top: 0 });
+  }
+
+  allNavLinks.forEach(link => link.addEventListener('click', () => setActive(link.dataset.target)));
+  allTabButtons.forEach(btn => btn.addEventListener('click', () => setActive(btn.dataset.target)));
+
+  setActive('software');
+</script>
+
+</body>
+</html>
