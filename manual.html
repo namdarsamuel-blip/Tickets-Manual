@@ -1129,7 +1129,7 @@
     <header class="page-head">
       <span class="eyebrow">05 · Reference</span>
       <h2>Glossary</h2>
-      <p class="desc">Quick lookup, A–Z. Each term has a short definition — expand for more detail on what it's used for and things to watch.</p>
+      <p class="desc">Search anything — terms, topics, strategies, workflows. Typos are fine. Results rank by relevance.</p>
     </header>
 
     <div class="glossary-search-wrap">
@@ -1792,19 +1792,68 @@
   const glossaryIndex = glossaryItems.map(item => {
     const term = item.querySelector('.term')?.textContent || '';
     const def = item.querySelector('.def')?.textContent || '';
-    const details = Array.from(item.querySelectorAll('details p, details li')).map(el => el.textContent).join(' ');
-    return { el: item, text: (term + ' ' + def + ' ' + details).toLowerCase() };
+    const details = Array.from(item.querySelectorAll('details p, details li, details b')).map(el => el.textContent).join(' ');
+    return { el: item, term: term.toLowerCase(), text: (term + ' ' + def + ' ' + details).toLowerCase() };
   });
+
+  // Fuzzy match: checks if all chars of query appear in order in target (handles typos/transpositions)
+  function fuzzyMatch(text, query) {
+    if (text.includes(query)) return { match: true, score: 2 }; // exact substring = highest score
+    // Try each word in query individually
+    const words = query.split(/\s+/).filter(w => w.length > 1);
+    if (words.every(w => text.includes(w))) return { match: true, score: 1.5 };
+    // Subsequence match (handles extra/missing letters)
+    let qi = 0;
+    for (let i = 0; i < text.length && qi < query.length; i++) {
+      if (text[i] === query[qi]) qi++;
+    }
+    if (qi >= query.length * 0.85) return { match: true, score: 1 };
+    // Trigram similarity for typo tolerance
+    const textTrigrams = new Set();
+    for (let i = 0; i < text.length - 2; i++) textTrigrams.add(text.slice(i, i+3));
+    let matches = 0;
+    for (let i = 0; i < query.length - 2; i++) {
+      if (textTrigrams.has(query.slice(i, i+3))) matches++;
+    }
+    const similarity = query.length > 2 ? matches / (query.length - 2) : 0;
+    if (similarity >= 0.4) return { match: true, score: similarity };
+    return { match: false, score: 0 };
+  }
 
   glossarySearch.addEventListener('input', () => {
     const q = glossarySearch.value.trim().toLowerCase();
-    let visible = 0;
-    glossaryIndex.forEach(({ el, text }) => {
-      const show = q === '' || text.includes(q);
-      el.style.display = show ? '' : 'none';
-      if (show) visible++;
+    const results = [];
+
+    if (q === '') {
+      glossaryIndex.forEach(({ el }) => { el.style.display = ''; el.style.order = ''; });
+      glossaryNoResults.style.display = 'none';
+      return;
+    }
+
+    glossaryIndex.forEach(({ el, term, text }) => {
+      const termResult = fuzzyMatch(term, q);
+      const textResult = fuzzyMatch(text, q);
+      const score = Math.max(
+        termResult.match ? termResult.score + 1 : 0, // boost term matches
+        textResult.match ? textResult.score : 0
+      );
+      if (score > 0) {
+        results.push({ el, score });
+        el.style.display = '';
+      } else {
+        el.style.display = 'none';
+      }
     });
-    if (visible === 0 && q !== '') {
+
+    // Sort by relevance score
+    results.sort((a, b) => b.score - a.score);
+    results.forEach(({ el }, i) => { el.style.order = i; });
+
+    const wrap = document.getElementById('glossaryWrap');
+    if (wrap) wrap.style.display = 'flex';
+    if (wrap) wrap.style.flexDirection = 'column';
+
+    if (results.length === 0) {
       glossaryNoResultsTerm.textContent = glossarySearch.value.trim();
       glossaryNoResults.style.display = 'block';
     } else {
