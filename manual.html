@@ -405,15 +405,13 @@
       padding: 0;
     }
     .glossary-item {
-      padding: 16px 28px;
+      padding: 16px 28px 16px 28px;
       border-bottom: 1px solid var(--border);
-      border-right: none;
     }
-    /* Right column items get a left border */
     .glossary-item:nth-child(even) {
       border-left: 1px solid var(--border);
+      padding-left: 36px;
     }
-    /* Remove bottom border from last two items */
     .glossary-item:nth-last-child(1),
     .glossary-item:nth-last-child(2) {
       border-bottom: none;
