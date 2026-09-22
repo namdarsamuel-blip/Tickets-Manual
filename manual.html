@@ -190,7 +190,7 @@
   .nav-link.active .count { color: var(--brand); opacity: 0.7; }
 
   /* ---------- MAIN ---------- */
-  main { flex: 1; max-width: 760px; padding: 40px 48px 48px; width: 100%; }
+  main { flex: 1; padding: 40px 48px 48px; width: 100%; min-width: 0; }
 
   header.page-head { margin-bottom: 28px; }
 
@@ -212,12 +212,18 @@
   .panel { display: none; }
   .panel.active { display: block; }
 
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 18px 20px;
-    margin-bottom: 10px;
   }
 
   .card-head {
@@ -265,8 +271,8 @@
 
   .platform-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
   }
 
   .platform-card {
@@ -390,6 +396,22 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 2px 20px;
+  }
+
+  /* On wide screens, glossary items flow in 2 columns */
+  @media (min-width: 1100px) {
+    .glossary-wrap {
+      columns: 2;
+      column-gap: 0;
+      padding: 2px 0;
+    }
+    .glossary-item {
+      break-inside: avoid;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+    }
+    .glossary-item:nth-last-child(-n+2) { border-bottom: none; }
   }
 
   .glossary-item {
@@ -516,9 +538,22 @@
     main { padding: 16px 16px 110px; width: 100%; max-width: 100%; }
 
     .platform-grid { grid-template-columns: 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
     header.page-head h2 { font-size: 22px; }
     .card, .platform-card { padding: 15px 16px; }
     .card-head { flex-wrap: wrap; }
+  }
+
+  /* Medium screens: 2 columns */
+  @media (min-width: 861px) and (max-width: 1200px) {
+    .card-grid { grid-template-columns: repeat(2, 1fr); }
+    .platform-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* Wide screens: 3 columns */
+  @media (min-width: 1201px) {
+    .card-grid { grid-template-columns: repeat(3, 1fr); }
+    .platform-grid { grid-template-columns: repeat(3, 1fr); }
   }
 </style>
 </head>
@@ -840,6 +875,8 @@
       <p class="desc">The two ways we make money: presales (scheduled windows, usually Tue–Fri) and drops (unscheduled releases we monitor via Phantom any time of day). Presales are where we plan ahead; drops are where we stay sharp in between.</p>
     </header>
 
+
+    <div class="card-grid">
     <div class="card">
       <div class="card-head"><div class="card-title">Presales vs. drops</div><span class="tag term">Overview</span></div>
       <p><b>Presales</b> are scheduled — they happen Tue–Fri at set times, and we know they're coming in advance. We pick the cities and artists we want to target, get the links from the Google Sheet, and launch them in JANCY to join the queue before the window opens.</p>
@@ -895,6 +932,9 @@
       <div class="card-head"><div class="card-title">AI can find presale codes</div><span class="tag term">Tip</span></div>
       <p>Worth knowing: AI tools are generally quite good at finding presale codes if you ask. Not guaranteed to work every time, but a reasonable thing to try if you're stuck looking for one.</p>
     </div>
+
+    </div>
+
   </div>
   <div class="panel" data-panel="strategy">
     <header class="page-head">
@@ -903,6 +943,8 @@
       <p class="desc">This is the part that's still being figured out as we go — how to tell if a ticket is actually worth buying. These are working notes, not fixed rules.</p>
     </header>
 
+
+    <div class="card-grid">
     <div class="card">
       <div class="card-head"><div class="card-title">Auto-buy thresholds — example from Noah Kahan</div><span class="tag term">Example</span></div>
       <p>The price at which something becomes a clear auto-buy vs. "check VividSeats first" depends entirely on the specific artist and how well you know their market. As an example, for Noah Kahan specifically:</p>
@@ -1114,6 +1156,9 @@
       <div class="card-head"><div class="card-title">MLB postseason parking</div><span class="tag term">Don't overlook</span></div>
       <p>MLB postseason parking lots are buyable and resellable — and often overlooked. For high-demand games, lots sell out and parking passes can command real secondary market premiums. The office collectively ignored parking for a long time before it was pointed out; since then it's been a consistent add-on play. When you're buying postseason tickets, check whether parking is available and whether the game is hot enough that lots will sell out. If yes, add parking to your buy list alongside the tickets.</p>
     </div>
+
+    </div>
+
   </div>
 
   <!-- VENUES -->
@@ -1124,6 +1169,8 @@
       <p class="desc">The naming conventions used for sections in an arena, and the disclosure types that affect what you can sell a seat as. This becomes second nature fast — it's mostly about building a shared vocabulary with the team.</p>
     </header>
 
+
+    <div class="card-grid">
     <div class="card">
       <div class="card-head"><div class="card-title">Arena section names (lower bowl)</div><span class="tag term">Reference</span></div>
       <p><b>Primos</b> — the sideline sections, generally the best/highest-value seats in the lower bowl.</p>
@@ -1185,6 +1232,9 @@
       <div class="card-head"><div class="card-title">Choosing between equal-priced seats</div><span class="tag strategy">Pattern</span></div>
       <p>When multiple options are priced the same, prefer the larger pack size — a 4-pack or 6-pack is generally worth more than the equivalent number of seats split into pairs, since a fan looking for a bigger group has fewer listings to choose from. Within a price break, a smaller section with fewer available seats can sometimes be worth taking over a closer-but-larger section, since you're competing against far fewer other sellers for buyer attention.</p>
     </div>
+
+    </div>
+
   </div>
 
   <!-- GLOSSARY -->
