@@ -405,11 +405,17 @@
       padding: 0;
     }
     .glossary-item {
-      padding: 16px 36px;
+      padding: 16px 40px;
       border-bottom: 1px solid var(--border);
+    }
+    .glossary-item:nth-child(odd) {
+      padding-left: 28px;
+      padding-right: 40px;
     }
     .glossary-item:nth-child(even) {
       border-left: 1px solid var(--border);
+      padding-left: 40px;
+      padding-right: 28px;
     }
     .glossary-item:nth-last-child(1),
     .glossary-item:nth-last-child(2) {
